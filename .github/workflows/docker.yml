@@ -1,7 +1,8 @@
 name: Docker Build and Publish
 
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'     # auto compile daily
   push:
     branches: [main]
     paths:
@@ -12,6 +13,7 @@ on:
     paths:
       - Dockerfile
       - .dockerignore
+  workflow_dispatch:
 
 env:
   DOCKER_BUILDKIT: 1
@@ -23,7 +25,6 @@ jobs:
 
     outputs:
       name: ${{ steps.name.outputs.name }}
-      version: ${{ steps.version.outputs.version }}
       tags: ${{ steps.metadata.outputs.tags }}
       labels: ${{ steps.metadata.outputs.labels }}
 
@@ -42,6 +43,8 @@ jobs:
           images: |
             docker.io/${{ steps.name.outputs.name }}
             ghcr.io/${{ steps.name.outputs.name }}
+          tags: |
+            type=raw,value=latest
 
   build_and_publish:
     name: Build and Publish Container Image
